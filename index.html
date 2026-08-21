@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gia Phả — Phả hệ dòng họ</title>
+<meta name="description" content="Mini web gia phả nội bộ: dựng phả đồ, quản lý thành viên, lịch giỗ âm lịch, tra cứu quan hệ họ hàng.">
+<meta name="theme-color" content="#9c1f16">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%239c1f16'/><text y='72' x='50' font-size='62' text-anchor='middle' fill='%23f7e3c2' font-family='Georgia,serif'>族</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Noto+Serif:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+<!-- ============================ Màn hình khoá ============================ -->
+<div class="lock-screen" id="lockScreen" hidden>
+  <div class="lock-box">
+    <div class="brand__seal">族</div>
+    <h2 id="lockTitle">Gia phả dòng họ</h2>
+    <p style="color:var(--ink-2);font-size:.9rem">Trang nội bộ. Vui lòng nhập mã truy cập.</p>
+    <form id="lockForm">
+      <input class="input" type="password" id="lockInput" placeholder="Mã truy cập" autocomplete="current-password" style="text-align:center">
+      <div id="lockErr" style="color:var(--accent);font-size:.82rem;min-height:20px;margin-top:6px"></div>
+      <button class="btn btn--primary" type="submit" style="width:100%">Mở gia phả</button>
+    </form>
+  </div>
+</div>
+
+<!-- ================================ App ================================ -->
+<div class="app" id="app">
+
+  <header class="topbar">
+    <button class="btn btn--icon btn--ghost only-mobile" id="btnMenu" aria-label="Menu">☰</button>
+    <div class="brand">
+      <div class="brand__seal">族</div>
+      <div class="brand__txt">
+        <div class="brand__name" id="brandName">Gia phả dòng họ</div>
+        <div class="brand__sub" id="brandSub">Phả hệ nội bộ</div>
+      </div>
+    </div>
+
+    <div class="topbar__spacer"></div>
+
+    <div class="searchbox">
+      <span class="searchbox__icon">🔍</span>
+      <input type="search" id="globalSearch" placeholder="Tìm người trong họ…" autocomplete="off" aria-label="Tìm kiếm thành viên">
+      <div class="searchbox__results" id="searchResults"></div>
+    </div>
+
+    <button class="btn btn--icon btn--ghost" id="btnTheme" title="Đổi giao diện sáng/tối" aria-label="Đổi giao diện">🌙</button>
+    <button class="btn btn--primary" id="btnAdd"><span>＋</span><span class="hide-xs">Thêm người</span></button>
+  </header>
+
+  <div class="body">
+    <nav class="sidebar" id="sidebar">
+      <div class="nav-group">Gia phả</div>
+      <button class="nav-item" data-route="home"><span class="nav-item__icon">🏠</span> Trang chủ</button>
+      <button class="nav-item" data-route="tree"><span class="nav-item__icon">🌳</span> Phả đồ</button>
+      <button class="nav-item" data-route="outline"><span class="nav-item__icon">📜</span> Phả ký</button>
+      <button class="nav-item" data-route="list"><span class="nav-item__icon">👥</span> Danh sách
+        <span class="nav-item__badge" id="badgeCount">0</span></button>
+
+      <div class="nav-group">Việc họ</div>
+      <button class="nav-item" data-route="gio"><span class="nav-item__icon">🕯️</span> Ngày giỗ
+        <span class="nav-item__badge" id="badgeGio">0</span></button>
+      <button class="nav-item" data-route="events"><span class="nav-item__icon">📅</span> Sự kiện</button>
+      <button class="nav-item" data-route="relation"><span class="nav-item__icon">🔗</span> Tra quan hệ</button>
+      <button class="nav-item" data-route="docs"><span class="nav-item__icon">📖</span> Tư liệu</button>
+
+      <div class="nav-group">Khác</div>
+      <button class="nav-item" data-route="stats"><span class="nav-item__icon">📊</span> Thống kê</button>
+      <button class="nav-item" data-route="settings"><span class="nav-item__icon">⚙️</span> Cài đặt</button>
+
+      <div style="margin-top:auto;padding:14px 12px;font-size:.72rem;color:var(--ink-3);line-height:1.5">
+        Dữ liệu lưu ngay trong trình duyệt của bạn.<br>
+        <span id="lastSaved"></span>
+      </div>
+    </nav>
+
+    <main class="main" id="main"></main>
+  </div>
+</div>
+
+<!-- ============================== Ngăn kéo ============================== -->
+<div class="drawer-scrim" id="drawerScrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer__head">
+    <h2 id="drawerTitle">Thông tin</h2>
+    <button class="btn btn--icon btn--ghost" id="drawerClose" aria-label="Đóng">✕</button>
+  </div>
+  <div class="drawer__body" id="drawerBody"></div>
+  <div class="drawer__foot" id="drawerFoot"></div>
+</aside>
+
+<!-- =============================== Modal =============================== -->
+<div class="modal-scrim" id="modalScrim">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal__head">
+      <h2 id="modalTitle">Tiêu đề</h2>
+      <button class="btn btn--icon btn--ghost" id="modalClose" aria-label="Đóng">✕</button>
+    </div>
+    <div class="modal__body" id="modalBody"></div>
+    <div class="modal__foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+<input type="file" id="filePicker" accept=".json,.ged,.txt" hidden>
+<input type="file" id="photoPicker" accept="image/*" hidden>
+
+<script src="assets/js/lunar.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/kinship.js"></script>
+<script src="assets/js/tree.js"></script>
+<script src="assets/js/sample-data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
