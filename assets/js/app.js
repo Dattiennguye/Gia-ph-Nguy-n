@@ -495,9 +495,9 @@
     h += '<div class="tree-viewport" id="treeViewport">' +
       '<div class="tree-canvas" id="treeCanvas"></div>' +
       '<div class="tree-legend no-print">' +
-      '<span><i style="background:var(--blue)"></i>Nam</span>' +
-      '<span><i style="background:var(--pink)"></i>Nữ</span>' +
-      '<span><i style="background:var(--accent);opacity:.55"></i>Vợ chồng</span>' +
+      '<span><i style="background:var(--nam)"></i>Nam</span>' +
+      '<span><i style="background:var(--nu)"></i>Nữ</span>' +
+      '<span><i style="background:var(--chrome-mid);opacity:.6"></i>Vợ chồng</span>' +
       '<span>✝ Đã mất</span><span>Kéo để di chuyển · Ctrl+lăn chuột để phóng to</span>' +
       '</div>' +
       '<div class="tree-zoom no-print">' +
@@ -611,9 +611,10 @@
 
   /** Gom các biến màu thành CSS nội tuyến cho SVG khi xuất ảnh */
   function collectTreeCSS() {
-    var vars = ['--surface', '--border', '--border-2', '--ink', '--ink-2', '--ink-3',
-      '--accent', '--accent-soft', '--gold', '--gold-soft', '--blue', '--blue-soft',
-      '--pink', '--pink-soft', '--bg', '--serif'];
+    var vars = ['--solid', '--solid-2', '--glass', '--glass-brd', '--glass-brd-2',
+      '--hairline', '--ink', '--ink-2', '--ink-3', '--ink-4',
+      '--chrome', '--chrome-mid', '--nam', '--nam-soft', '--nu', '--nu-soft',
+      '--gold', '--bg', '--bg-2', '--sans', '--serif'];
     var decl = vars.map(function (v) { return v + ':' + getVar(v); }).join(';');
     var out = ':root{' + decl + '}\n';
     Array.prototype.forEach.call(document.styleSheets, function (sheet) {
@@ -626,7 +627,7 @@
         }
       });
     });
-    out += '.tree-card, .tree-toggle { font-family: "Be Vietnam Pro", sans-serif; }\n';
+    out += '.tree-card, .tree-toggle { font-family: Inter, "Segoe UI", sans-serif; }\n';
     return out;
   }
 
@@ -801,10 +802,10 @@
         '<h3>Không tìm thấy ai</h3><p>Thử bỏ bớt điều kiện lọc.</p></div></td></tr>';
       return;
     }
-    body.innerHTML = list.map(function (m) {
+    body.innerHTML = list.map(function (m, i) {
       var f = S.byId(m.fatherId);
       var sp = S.spousesOf(m.id).map(function (s) { return s.person.hoTen; }).join(', ');
-      return '<tr data-open="' + esc(m.id) + '">' +
+      return '<tr data-open="' + esc(m.id) + '" style="--i:' + Math.min(i, 14) + '">' +
         '<td><div class="person-cell">' + avatar(m, 'avatar--sm') +
         '<span><b>' + esc(m.hoTen) + '</b>' + (m.tenThuong ? '<br><span style="font-size:.78rem;color:var(--ink-3)">' + esc(m.tenThuong) + '</span>' : '') + '</span></div></td>' +
         '<td><span class="tag tag--doi">' + gen[m.id] + '</span></td>' +
@@ -1148,8 +1149,8 @@
       '<div>' + avatar(B, 'avatar--lg') + '<div style="font-weight:600;margin-top:6px">' + esc(B.hoTen) + '</div>' +
       '<div style="font-size:.78rem;color:var(--ink-3)">Đời ' + S.genOf(B.id) + '</div></div>' +
       '</div>';
-    h += '<div style="text-align:center;padding:14px;background:var(--accent-soft);border-radius:var(--radius);margin:10px 0">' +
-      '<div style="font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--accent)">' + esc(r.forward) + '</div>' +
+    h += '<div style="text-align:center;padding:16px;background:var(--glass-2);border:1px solid var(--glass-brd);border-radius:var(--radius);margin:10px 0">' +
+      '<div style="font-family:var(--serif);font-size:1.2rem;font-weight:700;color:var(--chrome)">' + esc(r.forward) + '</div>' +
       '<div style="margin-top:6px;color:var(--ink-2);font-size:.92rem">' + esc(r.backward) + '</div></div>';
 
     if (r.chain && r.chain.length > 1) {
@@ -1716,7 +1717,7 @@
   }
 
   function applyTheme() {
-    var mode = S.prefs().theme || 'auto';
+    var mode = S.prefs().theme || 'dark';
     var dark = mode === 'dark' ||
       (mode === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
     document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
@@ -1770,7 +1771,7 @@
     applyTheme();
     if (window.matchMedia) {
       window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
-        if ((S.prefs().theme || 'auto') === 'auto') applyTheme();
+        if (S.prefs().theme === 'auto') applyTheme();
       });
     }
 
@@ -1792,6 +1793,30 @@
 
     bindSearch();
     bindGlobalEvents();
+    bindRevealCursor();
+  }
+
+  /** Quầng sáng chạy theo con trỏ trên các bề mặt kính (kiểu Fluent Reveal) */
+  function bindRevealCursor() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var SEL = '.card, .stat, .btn, .nav-item, .rel-item, .gio-item';
+    var pending = null;
+    document.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      pending = e;
+      if (pending._q) return;
+      pending._q = true;
+      requestAnimationFrame(function () {
+        var ev = pending;
+        if (!ev) return;
+        pending = null;
+        var el = ev.target.closest ? ev.target.closest(SEL) : null;
+        if (!el) return;
+        var r = el.getBoundingClientRect();
+        el.style.setProperty('--rx', (ev.clientX - r.left) + 'px');
+        el.style.setProperty('--ry', (ev.clientY - r.top) + 'px');
+      });
+    }, { passive: true });
   }
 
   function bindGlobalEvents() {
