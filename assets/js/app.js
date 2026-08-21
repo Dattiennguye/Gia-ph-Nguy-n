@@ -616,7 +616,6 @@
       '--pink', '--pink-soft', '--bg', '--serif'];
     var decl = vars.map(function (v) { return v + ':' + getVar(v); }).join(';');
     var out = ':root{' + decl + '}\n';
-    $$('link[rel=stylesheet], style').forEach(function () {});
     Array.prototype.forEach.call(document.styleSheets, function (sheet) {
       var rules;
       try { rules = sheet.cssRules; } catch (e) { return; }

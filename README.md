@@ -8,19 +8,29 @@ Dựng phả đồ nhiều đời, quản lý hồ sơ từng người, tính ng
 
 ## Chạy trên web (GitHub Pages)
 
-Trang này là HTML/CSS/JavaScript thuần, chỉ cần đưa lên là chạy.
+Trang này là HTML/CSS/JavaScript thuần, chỉ cần đưa lên là chạy. Cần **bật GitHub Pages một lần** (thao tác này phải làm bằng tay, workflow không tự bật hộ được vì token của Actions không có quyền tạo site).
 
-1. Vào repo trên GitHub → **Settings** → **Pages**
-2. Mục **Build and deployment** → **Source**: chọn **GitHub Actions**
-3. Xong. Mỗi lần đẩy code lên nhánh này, workflow `.github/workflows/deploy-pages.yml` sẽ tự xuất bản lại.
+### Cách 1 — Đơn giản nhất, không cần Actions
+
+1. Mở repo trên GitHub → tab **Settings** → mục **Pages** (cột bên trái)
+2. **Build and deployment → Source**: chọn **Deploy from a branch**
+3. **Branch**: chọn `claude/mini-web-gia-pha-itpieh`, thư mục `/ (root)` → bấm **Save**
+4. Đợi 1–2 phút, tải lại trang Settings → Pages sẽ hiện địa chỉ trang
+
+Tệp `.nojekyll` đã có sẵn để GitHub không bỏ qua thư mục `assets`.
+
+### Cách 2 — Dùng GitHub Actions (tự đăng lại mỗi lần sửa)
+
+1. **Settings → Pages → Source**: chọn **GitHub Actions**
+2. Vào tab **Actions** → chọn workflow *Deploy to GitHub Pages* → bấm **Run workflow**
+
+Từ đó về sau mỗi lần đẩy code lên nhánh này, workflow `.github/workflows/deploy-pages.yml` sẽ tự xuất bản lại.
 
 Địa chỉ trang sẽ có dạng:
 
 ```
-https://<tên-tài-khoản>.github.io/<tên-repo>/
+https://dattiennguye.github.io/Gia-ph-Nguy-n/
 ```
-
-> Nếu muốn dùng cách đơn giản hơn: **Settings → Pages → Source: Deploy from a branch**, chọn nhánh và thư mục `/ (root)`. Tệp `.nojekyll` đã có sẵn để GitHub không xử lý lại thư mục `assets`.
 
 ### Chạy thử trên máy (tuỳ chọn)
 
