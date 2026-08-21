@@ -8,29 +8,26 @@ Dựng phả đồ nhiều đời, quản lý hồ sơ từng người, tính ng
 
 ## Chạy trên web (GitHub Pages)
 
-Trang này là HTML/CSS/JavaScript thuần, chỉ cần đưa lên là chạy. Cần **bật GitHub Pages một lần** (thao tác này phải làm bằng tay, workflow không tự bật hộ được vì token của Actions không có quyền tạo site).
+Trang này là HTML/CSS/JavaScript thuần, chỉ cần đưa lên là chạy — không cần build, không cần GitHub Actions.
 
-### Cách 1 — Đơn giản nhất, không cần Actions
+Cách bật (chỉ làm một lần):
 
 1. Mở repo trên GitHub → tab **Settings** → mục **Pages** (cột bên trái)
 2. **Build and deployment → Source**: chọn **Deploy from a branch**
-3. **Branch**: chọn `claude/mini-web-gia-pha-itpieh`, thư mục `/ (root)` → bấm **Save**
-4. Đợi 1–2 phút, tải lại trang Settings → Pages sẽ hiện địa chỉ trang
+3. **Branch**: chọn `main`, thư mục `/ (root)` → bấm **Save**
+4. Đợi 1–2 phút, tải lại trang là thấy địa chỉ site
 
-Tệp `.nojekyll` đã có sẵn để GitHub không bỏ qua thư mục `assets`.
-
-### Cách 2 — Dùng GitHub Actions (tự đăng lại mỗi lần sửa)
-
-1. **Settings → Pages → Source**: chọn **GitHub Actions**
-2. Vào tab **Actions** → chọn workflow *Deploy to GitHub Pages* → bấm **Run workflow**
-
-Từ đó về sau mỗi lần đẩy code lên nhánh này, workflow `.github/workflows/deploy-pages.yml` sẽ tự xuất bản lại.
-
-Địa chỉ trang sẽ có dạng:
+Địa chỉ trang:
 
 ```
 https://dattiennguye.github.io/Gia-ph-Nguy-n/
 ```
+
+Từ đó về sau, mỗi lần đẩy code lên `main` là GitHub tự đăng lại, không cần thao tác gì thêm.
+
+> Lưu ý: GitHub Pages **không nhận nhánh có dấu `/` trong tên** (ví dụ `claude/mini-web-gia-pha-itpieh` sẽ không hiện trong danh sách chọn). Hãy dùng `main`.
+>
+> Tệp `.nojekyll` đã có sẵn để GitHub không bỏ qua thư mục `assets`.
 
 ### Chạy thử trên máy (tuỳ chọn)
 
@@ -154,7 +151,6 @@ assets/js/kinship.js        Tính quan hệ và cách xưng hô Việt Nam
 assets/js/tree.js           Bố cục & vẽ phả đồ SVG, zoom/pan
 assets/js/sample-data.js    Dữ liệu mẫu (họ Nguyễn, 6 đời, 36 người)
 assets/js/app.js            Giao diện, định tuyến, các màn hình
-.github/workflows/          Tự động xuất bản lên GitHub Pages
 ```
 
 Không dùng thư viện ngoài, không cần bước build. Sửa tệp, đẩy lên là chạy.
